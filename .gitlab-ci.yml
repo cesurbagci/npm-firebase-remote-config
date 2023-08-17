@@ -1,0 +1,22 @@
+image: node:latest
+
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  script:
+    - git config --global user.email "cesurbagci@gmail.com"
+    - git config --global user.name "cesurbagci"
+    - FE_CI_GROUP_ID=$FE_CI_GROUP_ID FE_NPM_READ_TOKEN=$FE_NPM_READ_TOKEN npm install
+    - CI=false
+    # - "npm version prerelease --preid commit-$CI_COMMIT_SHORT_SHA"
+    # - "npm version"
+    - rm -f .gitlab-ci.yml
+    - rm -f README.md
+    - rm -f .npmrc
+    - rm -rf test
+    - rm -rf documentations
+    - mv .npmrcPublish .npmrc
+    - "npm publish --tag git-latest-commit"
+    - echo "-- build completed succesfully"
