@@ -1,6 +1,6 @@
 {
   "name": "@cesurbagci/npm-firebase-remote-config",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,11 +8,12 @@
     "validate": "node -e 'require(\"./index.js\").validateConfig()'",
     "push": "node -e 'require(\"./index.js\").pushConfig()' && git add . && git commit -m \"new version\" && git push",
     "print-config": "node -e 'require(\"./index.js\").printConfigInRemote()'",
-    "pull-meta": "node -e 'require(\"./index.js\").pullConfigMeta()'"
+    "pull-meta": "node -e 'require(\"./index.js\").pullConfigMeta()'",
+    "increase-version": "node -e 'require(\"./index.js\").increaseVersion()'"
   },
   "author": "cesurbagci@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "firebase-admin": "^10.0.2"
+    "firebase-admin": "^11.11.0"
   }
 }
