@@ -297,7 +297,6 @@ async function setup() {
     }
     
     // Kullanıcının package.json dosyasına script'leri ekleyelim
-    const userPackageJsonPath = path.join(userProjectRoot, 'package.json');
     try {
       if (fs.existsSync(userPackageJsonPath)) {
         const userPackageJson = JSON.parse(fs.readFileSync(userPackageJsonPath, 'utf8'));
