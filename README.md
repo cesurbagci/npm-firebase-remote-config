@@ -20,11 +20,17 @@ Paketi kurduğunuzda, şu adımları izlemelisiniz:
    - "Generate new private key" düğmesine tıklayın
    - İndirilen JSON dosyasını projenizin kök dizinine `serviceAccountKey.json` olarak kaydedin
 
-2. Kurulum komutunu çalıştırın:
+2. Kurulum komutunu çalıştırın. Aşağıdaki yöntemlerden birini kullanabilirsiniz:
 
    ```bash
+   # Paketi kurduysanız
+   npm run remote-config:setup
+
+   # Paketi kurmadan doğrudan npx ile çalıştırma
    npx @cesurbagci/npm-firebase-remote-config setup
    ```
+
+   > Not: Kurulum sırasında paketiniz yoksa otomatik olarak bağımlılıklara eklenecektir.
 
 3. Kurulum sırasında, aşağıdaki bilgiler istenecektir:
    - Ana URL: Remote config'in kontrol edileceği endpoint URL'si (örn: `https://mydomain.com`)
@@ -116,7 +122,54 @@ Koşulları yapılandırmak için `configs/conditions.json` dosyasını düzenle
 - Firebase projenizde Remote Config API'nin etkinleştirildiğinden emin olun
 - Servis hesabının (service account) yeterli izinlere sahip olduğundan emin olun
 
+## Development
+
+Bu bölüm, npm-firebase-remote-config paketini geliştirmek veya local olarak test etmek isteyenler için yazılmıştır.
+
+### Local Linkli Geliştirme
+
+Paketi local olarak linklemek ve geliştirme yapmak için:
+
+1. Paket dizininde npm link komutunu çalıştırın:
+
+   ```bash
+   cd /path/to/npm-firebase-remote-config
+   npm link
+   ```
+
+2. Kullanmak istediğiniz projede paket linkini oluşturun:
+
+   ```bash
+   cd /path/to/your/project
+   npm link @cesurbagci/npm-firebase-remote-config
+   ```
+
+3. Local linkli geliştirme işlemini tamamladığınızda, global bağlantıyı kaldırmak için:
+
+   ```bash
+   npm unlink -g @cesurbagci/npm-firebase-remote-config
+   ```
+
+4. Projenizdeki link bağlantısını normal bağımlılık ile değiştirmek için:
+
+   ```bash
+   npm unlink @cesurbagci/npm-firebase-remote-config
+   npm install @cesurbagci/npm-firebase-remote-config
+   ```
+
+### Registry'den Çekmeden Local Kullanım
+
+Eğer geliştirdiğiniz paketi registry'den çekmeden doğrudan local dosyalardan kullanmak isterseniz:
+
+```bash
+# Local dosyalardan çalıştırır
+npx --no-install npm-firebase-remote-config setup
+```
+
+Bu komut, global olarak veya node_modules içinde bulunan paketi kullanmak yerine, şu anda bulunduğunuz dizindeki kodu çalıştırır.
+
 ## Notlar
 
 - Bu paket, Node.js ortamında çalışmaktadır ve sunucu tarafı uygulamaları içindir
 - Firebase Remote Config'in mobil ve web uygulamalarında kullanımı için Firebase SDK'larını kullanmanız önerilir
+

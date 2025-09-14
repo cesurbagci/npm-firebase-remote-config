@@ -70,6 +70,39 @@ async function setup() {
     const userProjectRoot = process.env.INIT_CWD || process.cwd();
     console.log(`Çalışma dizini: ${userProjectRoot}`);
     
+    // Paket bağımlılığını kontrol et ve yoksa ekle
+    const userPackageJsonPath = path.join(userProjectRoot, 'package.json');
+    if (fs.existsSync(userPackageJsonPath)) {
+      try {
+        const userPackageJson = JSON.parse(fs.readFileSync(userPackageJsonPath, 'utf8'));
+        
+        // dependencies kısmı yoksa oluşturalım
+        if (!userPackageJson.dependencies) {
+          userPackageJson.dependencies = {};
+        }
+        
+        // @cesurbagci/npm-firebase-remote-config paketi dependencies içinde yoksa ekle
+        if (!userPackageJson.dependencies['@cesurbagci/npm-firebase-remote-config']) {
+          console.log('📦 @cesurbagci/npm-firebase-remote-config paketi bağımlılıklara ekleniyor...');
+          userPackageJson.dependencies['@cesurbagci/npm-firebase-remote-config'] = "^1.3.0";
+          
+          fs.writeFileSync(
+            userPackageJsonPath,
+            JSON.stringify(userPackageJson, null, 2),
+            'utf8'
+          );
+          
+          console.log('✅ Paket bağımlılıklara eklendi. npm install komutunu çalıştırmanız önerilir.');
+        } else {
+          console.log('✅ @cesurbagci/npm-firebase-remote-config paketi zaten bağımlılıklarda mevcut.');
+        }
+      } catch (err) {
+        console.warn(`⚠️ Uyarı: package.json kontrolü sırasında hata oluştu: ${err.message}`);
+      }
+    } else {
+      console.warn('⚠️ Uyarı: Projenizde package.json dosyası bulunamadı. Paket bağımlılığı eklenemiyor.');
+    }
+    
     // serviceAccountKey.json dosyasının kullanıcının proje kök dizininde varlığını kontrol et
     const serviceAccountPath = path.join(userProjectRoot, 'serviceAccountKey.json');
     
