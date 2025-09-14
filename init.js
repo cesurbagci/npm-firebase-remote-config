@@ -92,7 +92,29 @@ async function setup() {
             'utf8'
           );
           
-          console.log('✅ Paket bağımlılıklara eklendi. npm install komutunu çalıştırmanız önerilir.');
+          console.log('✅ Paket bağımlılıklara eklendi.');
+          
+          // Kullanıcıya npm install çalıştırmak isteyip istemediğini soralım
+          const installAnswer = await promptUser('Paketi şimdi yüklemek için npm install çalıştırılsın mı? (y/n): ');
+          
+          if (installAnswer.toLowerCase() === 'y') {
+            console.log('📦 npm install çalıştırılıyor...');
+            
+            // child_process modülünü kullanarak npm install komutunu çalıştır
+            const { execSync } = require('child_process');
+            try {
+              execSync('npm install', { 
+                cwd: userProjectRoot, 
+                stdio: 'inherit' // Kullanıcıya çıktıları göster
+              });
+              console.log('✅ Paket başarıyla yüklendi.');
+            } catch (error) {
+              console.error(`❌ HATA: npm install çalıştırılırken bir sorun oluştu: ${error.message}`);
+              console.log('Daha sonra manuel olarak "npm install" komutunu çalıştırabilirsiniz.');
+            }
+          } else {
+            console.log('ℹ️ Daha sonra manuel olarak "npm install" komutunu çalıştırabilirsiniz.');
+          }
         } else {
           console.log('✅ @cesurbagci/npm-firebase-remote-config paketi zaten bağımlılıklarda mevcut.');
         }

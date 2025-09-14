@@ -4,13 +4,27 @@ Firebase Remote Config, uygulamalarınız için uzaktan yapılandırma ayarları
 
 ## Kurulum
 
+Paketi kurmanın iki yolu vardır:
+
+### 1. NPM ile Kurulum
+
 ```bash
 npm install @cesurbagci/npm-firebase-remote-config --save
 ```
 
+### 2. Doğrudan NPX ile Kurulum
+
+Paketi önceden kurmadan doğrudan kullanabilirsiniz:
+
+```bash
+npx @cesurbagci/npm-firebase-remote-config setup
+```
+
+> Not: Bu yöntemle kurulum sırasında paketiniz yoksa otomatik olarak bağımlılıklara eklenecektir. Kurulum sırasında size npm install komutunu çalıştırmak isteyip istemediğiniz sorulacaktır.
+
 ## Başlangıç
 
-Paketi kurduğunuzda, şu adımları izlemelisiniz:
+Paketi kurduktan sonra, şu adımları izlemelisiniz:
 
 1. Firebase konsolundan bir servis hesap anahtarı (serviceAccountKey.json) oluşturun
    - [Firebase Console](https://console.firebase.google.com/) adresine gidin
@@ -20,17 +34,11 @@ Paketi kurduğunuzda, şu adımları izlemelisiniz:
    - "Generate new private key" düğmesine tıklayın
    - İndirilen JSON dosyasını projenizin kök dizinine `serviceAccountKey.json` olarak kaydedin
 
-2. Kurulum komutunu çalıştırın. Aşağıdaki yöntemlerden birini kullanabilirsiniz:
+2. Kurulum komutunu çalıştırın:
 
    ```bash
-   # Paketi kurduysanız
    npm run remote-config:setup
-
-   # Paketi kurmadan doğrudan npx ile çalıştırma
-   npx @cesurbagci/npm-firebase-remote-config setup
    ```
-
-   > Not: Kurulum sırasında paketiniz yoksa otomatik olarak bağımlılıklara eklenecektir.
 
 3. Kurulum sırasında, aşağıdaki bilgiler istenecektir:
    - Ana URL: Remote config'in kontrol edileceği endpoint URL'si (örn: `https://mydomain.com`)
