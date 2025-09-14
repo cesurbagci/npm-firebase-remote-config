@@ -20,7 +20,11 @@ Paketi önceden kurmadan doğrudan kullanabilirsiniz:
 npx @cesurbagci/npm-firebase-remote-config setup
 ```
 
-> Not: Bu yöntemle kurulum sırasında paketiniz yoksa otomatik olarak bağımlılıklara eklenecektir. Tüm kurulum adımları tamamlandığında size npm install komutunu çalıştırmak isteyip istemediğiniz sorulacaktır.
+> Not: Bu yöntemle kurulum sırasında:
+>
+> - Eğer projenizde `package.json` dosyası yoksa, otomatik olarak `npm init -y` çalıştırılarak oluşturulacaktır
+> - Paketiniz bağımlılıklarda yoksa otomatik olarak eklenecektir
+> - Tüm kurulum adımları tamamlandığında size npm install komutunu çalıştırmak isteyip istemediğiniz sorulacaktır
 
 ## Başlangıç
 

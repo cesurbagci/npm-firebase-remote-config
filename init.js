@@ -72,12 +72,41 @@ async function setup() {
     
     // Paket bağımlılığını kontrol et ve yoksa ekle
     const userPackageJsonPath = path.join(userProjectRoot, 'package.json');
+    
+    // package.json dosyası yoksa, npm init ile oluşturalım
+    if (!fs.existsSync(userPackageJsonPath)) {
+      console.log('📦 Projenizde package.json dosyası bulunamadı. npm init -y çalıştırılıyor...');
+      
+      // child_process modülünü kullanarak npm init -y komutunu çalıştır
+      const { execSync } = require('child_process');
+      try {
+        execSync('npm init -y', { 
+          cwd: userProjectRoot, 
+          stdio: 'inherit' // Kullanıcıya çıktıları göster
+        });
+        console.log('✅ package.json dosyası başarıyla oluşturuldu.');
+        
+        // Yeni oluşturulan package.json dosyasını tekrar kontrol edelim
+        if (!fs.existsSync(userPackageJsonPath)) {
+          console.error('❌ HATA: npm init çalıştırıldı ancak package.json dosyası oluşturulamadı.');
+          console.warn('⚠️ Uyarı: Paket bağımlılıkları eklenemiyor.');
+          // Ama yine de devam edelim, serviceAccountKey.json kontrolü vb. için
+        }
+      } catch (error) {
+        console.error(`❌ HATA: npm init çalıştırılırken bir sorun oluştu: ${error.message}`);
+        console.warn('⚠️ Uyarı: Paket bağımlılıkları eklenemiyor.');
+        // Ama yine de devam edelim, serviceAccountKey.json kontrolü vb. için
+      }
+    }
+    
+    // package.json dosyasını okumayı deneyelim (yeni oluşturulmuş olabilir)
     if (fs.existsSync(userPackageJsonPath)) {
       try {
         const userPackageJson = JSON.parse(fs.readFileSync(userPackageJsonPath, 'utf8'));
         
         // dependencies kısmı yoksa oluşturalım
         if (!userPackageJson.dependencies) {
+          console.log('📦 package.json dosyasına dependencies bölümü ekleniyor...');
           userPackageJson.dependencies = {};
         }
         
@@ -96,12 +125,11 @@ async function setup() {
         } else {
           console.log('✅ @cesurbagci/npm-firebase-remote-config paketi zaten bağımlılıklarda mevcut.');
         }
-        }
       } catch (err) {
         console.warn(`⚠️ Uyarı: package.json kontrolü sırasında hata oluştu: ${err.message}`);
       }
     } else {
-      console.warn('⚠️ Uyarı: Projenizde package.json dosyası bulunamadı. Paket bağımlılığı eklenemiyor.');
+      console.warn('⚠️ Uyarı: Projenizde package.json dosyası bulunamadı veya oluşturulamadı. Paket bağımlılığı eklenemiyor.');
     }
     
     // serviceAccountKey.json dosyasının kullanıcının proje kök dizininde varlığını kontrol et
@@ -345,6 +373,55 @@ async function setup() {
       }
     } catch (err) {
       console.warn(`⚠️ Uyarı: package.json güncellenirken hata oluştu: ${err.message}`);
+    }
+
+    // .gitignore dosyasını kontrol et ve yoksa oluştur
+    const gitignorePath = path.join(userProjectRoot, '.gitignore');
+    if (!fs.existsSync(gitignorePath)) {
+      console.log('📝 .gitignore dosyası oluşturuluyor...');
+      const gitignoreContent = `# Firebase Remote Config için dışlama kuralları
+node_modules/
+package-lock.json
+*.DS_Store
+.npmrc
+serviceAccountKey.json
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.idea/
+.vscode/
+coverage/
+.nyc_output/
+dist/
+build/
+`;
+      try {
+        fs.writeFileSync(gitignorePath, gitignoreContent, 'utf8');
+        console.log('✅ .gitignore dosyası başarıyla oluşturuldu.');
+        console.log('   💡 İpucu: serviceAccountKey.json dosyası güvenlik için .gitignore\'a eklenmiştir.');
+      } catch (err) {
+        console.warn(`⚠️ Uyarı: .gitignore dosyası oluşturulurken hata oluştu: ${err.message}`);
+      }
+    } else {
+      // .gitignore dosyası varsa, serviceAccountKey.json ekli mi kontrol et
+      try {
+        const gitignoreContent = fs.readFileSync(gitignorePath, 'utf8');
+        if (!gitignoreContent.includes('serviceAccountKey.json')) {
+          console.log('📝 Mevcut .gitignore dosyasına serviceAccountKey.json ekleniyor...');
+          fs.appendFileSync(gitignorePath, '\n# Firebase Remote Config için güvenlik dışlaması\nserviceAccountKey.json\n', 'utf8');
+          console.log('✅ .gitignore dosyası güncellendi.');
+        }
+      } catch (err) {
+        console.warn(`⚠️ Uyarı: .gitignore dosyası güncellenirken hata oluştu: ${err.message}`);
+      }
     }
 
     console.log('Kurulum başarıyla tamamlandı!');
