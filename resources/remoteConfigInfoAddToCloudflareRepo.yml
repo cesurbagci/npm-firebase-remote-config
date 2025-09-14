@@ -1,0 +1,104 @@
+# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
+
+name: Publish config file to Cloudflare Pages
+
+###################### Açıklama ######################
+# Cloudflare Pages uzerinde kullanilmak icin olusturulan versiyon dosyasini
+# target-repo reposunda /dist/remoteconfigs/{appName}.json dosyasini ekler veya gunceller.
+# Job in calismasi icin remoteconfig icinde remoteConfigInfo parametresi gereklidir ve formati asagidaki gibidir:
+# {
+#     "versionNumber": 1,
+#     "versionCheckUrlText": "https://{hostname}/remoteconfigs/{appName}",
+#     "versionCheckHttpMethod": "POST"
+# }
+#
+# npm run pull komutunu çalıştırır ve configs/parameters/remoteConfigInfo/defaultValue.json dosyasını 
+# target-repo reposunda dist/remoteconfigs/{appName}.json olarak ekler veya günceller.
+# Bu işlem manuel olarak tetiklenir.
+# Bu iş akışı iki işten oluşur:
+# 1. setup-remote-config-info: remoteConfigInfo dosyasını oluşturur ve artifacts olarak kaydeder.
+# 2. prepare-and-save-config-file: remoteConfigInfo dosyasını target-repo reposuna ekler veya günceller.
+######################################################
+
+on:
+  workflow_dispatch:
+    inputs:
+      token_secret_name:
+        description: 'Token secret adı'
+        required: false
+        default: 'PACKAGE_TOKEN'
+        type: string
+      app_name:
+        description: 'Uygulama adı (output dosyası için)'
+        required: true
+        type: string
+      target_repository:
+        description: 'Cloudflare da host edilmesi icin kullanilan hedef repository (format: organization/repo)'
+        required: true
+        default: '' # organization/repo
+        type: string
+  
+jobs:
+  setup-remote-config-info:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: https://npm.pkg.github.com/
+      - run: rm -f README.md
+      - run: rm -rf test
+      - run: rm -rf documentations
+      - run: |
+          echo "@cesurbagci:registry=https://npm.pkg.github.com" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets[inputs.token_secret_name || 'PACKAGE_TOKEN'] }}" >> .npmrc
+      - run: mkdir -p ./output
+      - run: npm install
+      - run: npm run pull
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-config-info-file
+          # path: /tmp/yt-playlist/*
+          path: ./configs/parameters/remoteConfigInfo/defaultValue.json
+          retention-days: 90  # 90 gün sonra otomatik olarak silinir
+  prepare-and-save-config-file:
+    runs-on: ubuntu-latest
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
+    needs: [setup-remote-config-info]
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com/
+      - uses: actions/checkout@v3
+        with:
+          repository: ${{ inputs.target_repository }}
+          token: ${{ secrets[inputs.token_secret_name || 'PACKAGE_TOKEN'] }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: app-config-info-file
+          path: ./dist
+      - run: mkdir -p ./dist/remoteconfigs
+      - run: mv ./dist/defaultValue.json ./dist/remoteconfigs/${{ inputs.app_name }}.json
+      - run: pwd
+      - run: ls -la dist
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          # Optional. Commit message for the created commit.
+          # Defaults to "Apply automatic changes"
+          commit_message: Automated Change
+          # Optional. Local and remote branch name where commit is going to be pushed
+          #  to. Defaults to the current branch.
+          #  You might need to set `create_branch: true` if the branch does not exist.
+          branch: main
+          commit_user_name: username # defaults to "github-actions[bot]"
+          commit_user_email: username@example.com # defaults to "41898282+github-actions[bot]@users.noreply.github.com"
+          commit_author: Author <actions@github.com> # defaults to author of the commit that triggered the run

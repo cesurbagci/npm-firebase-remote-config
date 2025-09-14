@@ -1,5 +1,6 @@
 
 const firebaseRemoteConfigLib = require('./lib/firebaseRemoteConfigLib');
+const utils = require('./lib/utils');
 
 exports.firebaseRemoteConfig = {};
 exports.firebaseRemoteConfig.initializeApp = firebaseRemoteConfigLib.initializeApp;
@@ -10,3 +11,4 @@ exports.firebaseRemoteConfig.printConfigInRemote = firebaseRemoteConfigLib.print
 exports.firebaseRemoteConfig.pullConfigMeta = firebaseRemoteConfigLib.pullConfigMeta;
 exports.firebaseRemoteConfig.pushConfig = firebaseRemoteConfigLib.pushConfig;
 exports.firebaseRemoteConfig.pullConfig = firebaseRemoteConfigLib.pullConfig;
+exports.firebaseRemoteConfig.checkServiceAccountKeyInUserProject = utils.checkServiceAccountKeyInUserProject;

@@ -1,20 +1,24 @@
 {
   "name": "@cesurbagci/npm-firebase-remote-config",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "",
   "main": "index.js",
+  "bin": "./init.js",
   "scripts": {
-    "pull": "git pull && node -e 'require(\"./index.js\").pullConfig()'",
-    "validate": "node -e 'require(\"./index.js\").validateConfig()'",
-    "push": "node -e 'require(\"./index.js\").pushConfig()' && git add . && git commit -m \"new version\" && git push",
-    "print-config": "node -e 'require(\"./index.js\").printConfigInRemote()'",
-    "pull-meta": "node -e 'require(\"./index.js\").pullConfigMeta()'",
-    "increase-version": "node -e 'require(\"./index.js\").increaseVersion()'",
-    "get-current-version-info": "node -e 'require(\"./index.js\").getCurrentVersionInfo()'"
+    "init": "node init.js setup",
+    "setup": "node init.js setup",
+    "pull": "node init.js pull",
+    "validate": "node init.js validate",
+    "push": "node init.js push && git add . && git commit -m \"new version\" && git push",
+    "print-config": "node init.js print-config",
+    "pull-meta": "node init.js pull-meta",
+    "increase-version": "node init.js increase-version",
+    "get-current-version-info": "node init.js get-current-version-info"
   },
   "author": "cesurbagci@gmail.com",
   "license": "ISC",
   "dependencies": {
+    "commander": "^14.0.1",
     "firebase-admin": "^11.11.0"
   }
 }
