@@ -93,30 +93,9 @@ async function setup() {
           );
           
           console.log('✅ Paket bağımlılıklara eklendi.');
-          
-          // Kullanıcıya npm install çalıştırmak isteyip istemediğini soralım
-          const installAnswer = await promptUser('Paketi şimdi yüklemek için npm install çalıştırılsın mı? (y/n): ');
-          
-          if (installAnswer.toLowerCase() === 'y') {
-            console.log('📦 npm install çalıştırılıyor...');
-            
-            // child_process modülünü kullanarak npm install komutunu çalıştır
-            const { execSync } = require('child_process');
-            try {
-              execSync('npm install', { 
-                cwd: userProjectRoot, 
-                stdio: 'inherit' // Kullanıcıya çıktıları göster
-              });
-              console.log('✅ Paket başarıyla yüklendi.');
-            } catch (error) {
-              console.error(`❌ HATA: npm install çalıştırılırken bir sorun oluştu: ${error.message}`);
-              console.log('Daha sonra manuel olarak "npm install" komutunu çalıştırabilirsiniz.');
-            }
-          } else {
-            console.log('ℹ️ Daha sonra manuel olarak "npm install" komutunu çalıştırabilirsiniz.');
-          }
         } else {
           console.log('✅ @cesurbagci/npm-firebase-remote-config paketi zaten bağımlılıklarda mevcut.');
+        }
         }
       } catch (err) {
         console.warn(`⚠️ Uyarı: package.json kontrolü sırasında hata oluştu: ${err.message}`);
@@ -372,6 +351,30 @@ async function setup() {
     console.log(`Ana URL: ${baseUrlCleaned}`);
     console.log(`Uygulama adı: ${appName}`);
     console.log(`Firebase Remote Config uygulama kurulumu için projenizin kök dizinindeki configs dizinini kontrol edin.`);
+    
+    // Kullanıcıya npm install çalıştırmak isteyip istemediğini soralım
+    if (fs.existsSync(userPackageJsonPath)) {
+      const installAnswer = await promptUser('\nPaket bağımlılıklarını yüklemek için npm install çalıştırılsın mı? (y/n): ');
+      
+      if (installAnswer.toLowerCase() === 'y') {
+        console.log('📦 npm install çalıştırılıyor...');
+        
+        // child_process modülünü kullanarak npm install komutunu çalıştır
+        const { execSync } = require('child_process');
+        try {
+          execSync('npm install', { 
+            cwd: userProjectRoot, 
+            stdio: 'inherit' // Kullanıcıya çıktıları göster
+          });
+          console.log('✅ Paket bağımlılıkları başarıyla yüklendi.');
+        } catch (error) {
+          console.error(`❌ HATA: npm install çalıştırılırken bir sorun oluştu: ${error.message}`);
+          console.log('Daha sonra manuel olarak "npm install" komutunu çalıştırabilirsiniz.');
+        }
+      } else {
+        console.log('ℹ️ Kurulum tamamlandı. İhtiyaç duyduğunuzda "npm install" komutunu çalıştırabilirsiniz.');
+      }
+    }
     
     rl.close();
   } catch (error) {
